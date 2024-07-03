@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Transition on Button Hover</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Cheltenham';
+            background-color: #eff2f1;
+            /* background-image: url('https://images.saymedia-content.com/.image/t_share/MTkyOTkyMzE2OTQ3MDQ3NjQ1/website-background-templates.png'); */
+            background-size: cover;
+            
+        }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width:100%;
+           
+        }
+        .buttons {
+            width: 50%;
+            padding: 40px;
+            
+        }
+        .buttons h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            
+        }
+        .buttons p {
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .buttons button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 20px;
+            margin-bottom: 10px;
+            border: 2px solid #f0efef;
+            background-color: #3b5d50; 
+            font-size: 18px;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 20px 20px 20px;
+            color: #eff2f1;
+           
+        }
+        .buttons button img {
+            margin-right: 20px;
+        }
+        .image-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .image-container img {
+            width: 100%;
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="buttons">
+        <h2>What are you framing?</h2>
+        <p>something digital:</p>
+        <button data-part="part1" data-url="frame.html">
+            
+            Digital Upload
+            <i class="fa fa-upload"></i>
+        </button>
+        <p>something physical (we send prepaid packaging):</p>
+        <button data-part="part2">
+          
+            Physical Photo or Art
+            <i class="fa fa-magic"></i>
+        </button>
+        <button data-part="part3">
+            
+            Documents or Paper
+            <i class="fa fa-file-text"></i>
+            <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_FUNpkbm3tJHYt4I6WjtOtdizk-LcgPi0YA&s" alt="Icon" width="40"> -->
+        </button>
+        <button data-part="part4">
+           
+            Jersey or Textiles
+            <i class="fa fa-asterisk" ></i>
+        </button>
+        <button data-part="part5">
+          
+            Objects With Depth
+            <i class="fa fa-ravelry" ></i>
+        </button>
+        <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+            <a href="#" style="text-decoration: none; font-size: 14px;color:#3b5d50;">Gifts</a>
+            <a href="#" style="text-decoration: none; font-size: 14px;color:#3b5d50;">Gallery Walls</a>
+        </div>
+    </div>
+    <div class="image-container">
+        <img src="https://www.framebridge.com/apps/designer/assets/what-are-you-framing-wall-2c4d1482.jpg" alt="Image" id="image">
+    </div>
+</div>
+
+<script>
+    const image = document.getElementById('image');
+    const buttons = document.querySelectorAll('.buttons button');
+
+    buttons.forEach(button => {
+        button.addEventListener('mouseover', () => {
+            const part = button.getAttribute('data-part');
+            switch (part) {
+                case 'part1':
+                    image.style.transform = 'scale(3.5) translate(0, 0)';
+                    break;
+                case 'part2':
+                    image.style.transform = 'scale(3.5) translate(-33%, 0)';
+                    break;
+                case 'part3':
+                    image.style.transform = 'scale(3.5) translate(0, -22%)';
+                    break;
+                case 'part4':
+                    image.style.transform = 'scale(3.5) translate(-33%, -25%)';
+                    break;
+                case 'part5':
+                    image.style.transform = 'scale(3.5) translate(-20%, -20%)';
+                    break;
+            }
+        });
+
+        button.addEventListener('mouseleave', () => {
+            image.style.transform = 'translateX(0,0)';
+        });
+        button.addEventListener('click', () => {
+            const url = button.getAttribute('data-url');
+            window.location.href = url;
+        });
+    });
+</script>
+
+</body>
+</html>

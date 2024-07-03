@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload and Edit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+   <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #fef7f2;
+    }
+
+    .container {
+        display: flex;
+        height: 100vh;
+        /* justify-content: center;
+        align-items: center; */
+        width: 100%;
+    }
+
+    .left-panel, .right-panel {
+        flex: 1;
+        padding: 20px;
+        height:100%;
+
+    }
+
+    .left-panel {
+        background-color: #d9e9d8;
+        display: flex;
+        flex-direction: column; /* Align items one under another */
+        justify-content: center; /* Center items vertically */
+        align-items: center;
+        width: 35%;
+    }
+
+    .right-panel {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 65%;
+    }
+
+    #upload-button, .edit-options button, #next-button, #size-next-button {
+        background-color: #3b5d50; 
+        border: none;
+        padding: 10px 20px;
+        margin: 10px;
+        cursor: pointer;
+        color:#fef7f2;
+    }
+
+    #upload-button:hover, .edit-options button:hover, #next-button:hover , #size-next-button:hover {
+        background-color: #3b5d50; 
+    }
+
+    #drop-area {
+        width: 300px;
+        height: 300px;
+        border: 2px dashed #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    #uploaded-image-container, #edit-image-container , #edit-image-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 300px;
+        width: 300px;
+        border: 2px solid #ccc;
+    }
+
+    #uploaded-image, #edit-image, #crop-image, #size-image {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    #uploaded-image-container p, #edit-image-container p {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 5px;
+        border-radius: 5px;
+    }
+    
+    .icon-container {
+        display: inline-block;
+        text-align: center;
+        margin: 5px;
+    }
+
+    .icon-circle {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 2px solid black;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .icon-container :hover {
+        background-color: #3b5d50;
+        color: #fef7f2;
+        cursor: pointer;
+    }
+
+    .icon-container i {
+        font-size: 20px;
+    }
+
+    .icon-name {
+        display: block;
+        font-size: 10px;
+    }
+
+    .aspect-ratios {
+        margin: 20px 0;
+    }
+
+    .aspect-ratios button {
+        background-color: #f0c948;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+    }
+
+    .aspect-ratios button:hover {
+        background-color: #e6b839;
+    }
+
+    .aspect-ratios button.active {
+        background-color: #ccc;
+    }
+    #done-button{
+        background-color:  #3b5d50;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        color:#ffffff;
+    }
+    #cancel-button{
+        background-color:  #3b5d50;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        color:#ffffff;
+    }
+  
+.frame-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.frame-option {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 30%; /* To make sure three cards fit in one row */
+    box-sizing: border-box;
+    text-align: center;
+    padding: 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.frame-image-container {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 200px;
+    border-radius: 4px;
+    position: relative;
+}
+
+.frame-image-container img {
+    width: 80%; /* Adjust size as needed */
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.frame-option p {
+    margin: 10px 0;
+}
+.frame-content{
+    border: 1px solid black;
+}
+
+@media (max-width: 768px) {
+    .frame-option {
+        width: 45%; /* Two cards per row on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .frame-option {
+        width: 100%; /* One card per row on very small screens */
+    }
+}
+
+
+   </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <h1>Great! Let's add your photo.</h1>
+            <br>
+            <p>We'll check its size and resolution to recommend the best print sizes.</p>
+            <button id="upload-button">Upload Here</button>
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+        </div>
+        <div class="right-panel">
+            <div id="drop-area">
+                <p>Or drag & drop it here</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="loading-container" style="display: none;">
+        <div class="left-panel">
+            <!-- <h1>100% Uploaded</h1> -->
+            <p><strong>FUN FACT</strong></p>
+            <p>Did you know? You can Framebridge just about anything—and we have! Over a million custom framed pieces, and counting.</p>
+        </div>
+        <div class="right-panel">
+            <div id="uploaded-image-container">
+                <!-- <img id="uploaded-image" src="" alt="Uploaded Image"> -->
+                <p>JUST A MOMENT</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="edit-container" style="display: none;">
+        <div class="left-panel">
+            <h1>Looking good! Want to make any edits?</h1>
+            <p>Now’s the time to crop or enhance your photo if you’d like.</p>
+            <div class="edit-options">
+                <div class="icon-container">
+                    <div class="icon-circle">
+                        <i id="crop-button" class="fa fa-crop"></i>
+                    </div>
+                    <span class="icon-name">Crop</span>
+                </div>
+                <div class="icon-container">
+                    <div class="icon-circle">
+                        <i id="rotate-button" class="fa fa-rotate-right"></i>
+                    </div>
+                    <span class="icon-name">Rotate</span>
+                </div>
+                <div class="icon-container">
+                    <div class="icon-circle">
+                        <i id="brightness-button" class="fa fa-sun-o"></i>
+                    </div>
+                    <span class="icon-name">Brightness</span>
+                </div>
+                <div class="icon-container">
+                    <div class="icon-circle">
+                        <i id="bw-button" class="fa fa-adjust"></i>
+                    </div>
+                    <span class="icon-name">B&W</span>
+                </div>
+            </div>
+            <button id="next-button">Next: Select Size</button>
+        </div>
+        <div class="right-panel">
+            <div id="edit-image-container">
+                <img id="edit-image" src="" alt="Edit Image">
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="crop-container" style="display: none;">
+        <div class="left-panel">
+            <h1>Crop your photo</h1>
+            <p>Choose an aspect ratio or go freeform.</p>
+            <div class="aspect-ratios">
+                <button id="freeform" class="active">Freeform</button>
+                <button id="aspect-1-1">1:1</button>
+                <button id="aspect-5-7">5:7</button>
+                <button id="aspect-2-3">2:3</button>
+                <button id="aspect-3-4">3:4</button>
+                <button id="aspect-4-5">4:5</button>
+            </div>
+            <button id="done-button">Done</button>
+            <button id="cancel-button">Cancel</button>
+        </div>
+        <div class="right-panel">
+            <div id="image-container">
+                <img id="crop-image" src="" alt="Image for cropping">
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="size-container" style="display: none;">
+        <div class="left-panel">
+            <h1>Nice! How big is it?</h1>
+            <p>All we need is an approximate size. Our experts will meticulously measure it once it arrives in our studio.</p>
+            <div>
+                <input type="number" placeholder="Enter Width" id="width-input">
+                <span>x</span>
+                <input type="number" placeholder="Enter Height" id="height-input">
+            </div>
+            <button id="size-next-button">Next: Pick A Frame</button>
+        </div>
+        <div class="right-panel">
+            <div id="image-container">
+                <img id="size-image" src="" alt="Image for cropping">
+            </div>
+        </div>
+       
+    </div>
+    <div class="frame-container" id="frame-container" style="display: none;">
+        <div class="row" style="width: 100%;">
+            <h2>Frames for Digital Photos</h2>
+        </div>
+        
+       
+        <div class="frame-option" id="cart-id">
+            <div class="frame-image-container" style="background-image:url('./images/frame1.jpg');">
+                <img  id="frame-image1" src="" alt="Overlay Image" style="width:60%">
+            </div>
+            <br>
+            <div class="frame-content" >
+                <p>Newport</p>
+                <p>$75+</p>
+            </div>
+        </div>
+        <div class="frame-option">
+            <div class="frame-image-container" style="background-image:url('./images/frame1.jpg');">
+                <img id="frame-image2" src="" alt="Overlay Image" style="width:60%">
+            </div>
+            <br>
+            <div class="frame-content" >
+                <p>Newport</p>
+                <p>$75+</p>
+            </div>
+        </div>
+        <div class="frame-option">
+            <div class="frame-image-container" style="background-image:url('./images/frame1.jpg');">
+                <img id="frame-image3" src="" alt="Overlay Image" style="width:60%">
+            </div>
+            <br>
+            <div class="frame-content" >
+                <p>Newport</p>
+                <p>$75+</p>
+            </div>
+        </div>
+        <div class="frame-option">
+            <div class="frame-image-container" style="background-image:url('./images/frame1.jpg');">
+                <img id="frame-image4" src="" alt="Overlay Image" style="width:60%">
+            </div>
+            <br>
+            <div class="frame-content" >
+                <p>Newport</p>
+                <p>$75+</p>
+            </div>
+        </div>
+        <div class="frame-option">
+            <div class="frame-image-container" style="background-image:url('./images/frame1.jpg');">
+                <img id="frame-image5" src="" alt="Overlay Image" style="width:60%">
+            </div>
+            <br>
+            <div class="frame-content" >
+                <p>Newport</p>
+                <p>$75+</p>
+            </div>
+        </div>
+        <div class="frame-option">
+            <div class="frame-image-container" style="background-image:url('./images/frame1.jpg');">
+                <img id="frame-image6" src="" alt="Overlay Image" style="width:60%">
+            </div>
+            <br>
+            <div class="frame-content" >
+            <p>Newport</p>
+            <p>$75+</p>
+            </div>
+        </div>
+    </div>
+    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script>
+        document.getElementById('upload-button').addEventListener('click', () => {
+            document.getElementById('file-input').click();
+        });
+
+        document.getElementById('file-input').addEventListener('change', handleFileSelect);
+        document.getElementById('drop-area').addEventListener('dragover', handleDragOver);
+        document.getElementById('drop-area').addEventListener('drop', handleFileDrop);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            uploadFile(file);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            uploadFile(file);
+        }
+
+        function uploadFile(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    showLoadingScreen(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function showLoadingScreen(imageSrc) {
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('loading-container').style.display = 'flex';
+
+            setTimeout(() => {
+                document.getElementById('loading-container').style.display = 'none';
+                document.getElementById('edit-container').style.display = 'flex';
+                document.getElementById('edit-image').src = imageSrc;
+            }, 2000);
+        }
+
+        document.getElementById('size-next-button').addEventListener('click', () => {
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('edit-container').style.display = 'none';
+            document.getElementById('crop-container').style.display = 'none';
+            document.getElementById('size-container').style.display = 'none';
+            document.getElementById('frame-container').style.display = 'flex';
+            
+            document.getElementById('frame-image1').src = document.getElementById('size-image').src;
+            document.getElementById('frame-image2').src = document.getElementById('size-image').src;
+            document.getElementById('frame-image3').src = document.getElementById('size-image').src;
+            document.getElementById('frame-image4').src = document.getElementById('size-image').src;
+            document.getElementById('frame-image5').src = document.getElementById('size-image').src;
+            document.getElementById('frame-image6').src = document.getElementById('size-image').src;
+        });
+
+        document.getElementById('next-button').addEventListener('click', () => {
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('edit-container').style.display = 'none';
+            document.getElementById('crop-container').style.display = 'none';
+            document.getElementById('size-container').style.display = 'flex';
+            document.getElementById('size-image').src = document.getElementById('edit-image').src;
+        });
+
+        document.getElementById('crop-button').addEventListener('click', () => {
+            document.getElementById('loading-container').style.display = 'none';
+            document.getElementById('edit-container').style.display = 'none';
+            document.getElementById('crop-container').style.display = 'flex';
+            document.getElementById('crop-image').src = document.getElementById('edit-image').src;
+
+            initializeCropper();
+        });
+
+        let cropper;
+        function initializeCropper() {
+            const cropImage = document.getElementById('crop-image');
+            cropper = new Cropper(cropImage, {
+                aspectRatio: NaN,
+                viewMode: 2,
+                autoCropArea: 1,
+            });
+
+            document.getElementById('freeform').addEventListener('click', () => setAspectRatio(NaN));
+            document.getElementById('aspect-1-1').addEventListener('click', () => setAspectRatio(1));
+            document.getElementById('aspect-5-7').addEventListener('click', () => setAspectRatio(5 / 7));
+            document.getElementById('aspect-2-3').addEventListener('click', () => setAspectRatio(2 / 3));
+            document.getElementById('aspect-3-4').addEventListener('click', () => setAspectRatio(3 / 4));
+            document.getElementById('aspect-4-5').addEventListener('click', () => setAspectRatio(4 / 5));
+            document.getElementById('done-button').addEventListener('click', cropImageNow);
+            document.getElementById('cancel-button').addEventListener('click', cancelCropping);
+        }
+
+        function setAspectRatio(aspectRatio) {
+            cropper.setAspectRatio(aspectRatio);
+            document.querySelectorAll('.aspect-ratios button').forEach(button => button.classList.remove('active'));
+            if (aspectRatio === NaN) {
+                document.getElementById('freeform').classList.add('active');
+            } else {
+                document.querySelector(`button[aspect-ratio="${aspectRatio}"]`).classList.add('active');
+            }
+        }
+
+        function cropImageNow() {
+            const croppedCanvas = cropper.getCroppedCanvas();
+            const croppedImage = croppedCanvas.toDataURL();
+            document.getElementById('crop-container').style.display = 'none';
+            document.getElementById('edit-container').style.display = 'flex';
+            document.getElementById('edit-image').src = croppedImage;
+        }
+
+        function cancelCropping() {
+            document.getElementById('crop-container').style.display = 'none';
+            document.getElementById('edit-container').style.display = 'flex';
+        }
+
+    let rotationDegree = 0;
+    let brightnessLevel = 100; // Default brightness level (100%)
+    let isBlackAndWhite = false;
+
+    document.getElementById('rotate-button').addEventListener('click', rotateImage);
+    document.getElementById('brightness-button').addEventListener('click', adjustBrightness);
+    document.getElementById('bw-button').addEventListener('click', toggleBlackAndWhite);
+
+    function rotateImage() {
+    rotationDegree = (rotationDegree + 90) % 360;
+    document.getElementById('edit-image').style.transform = `rotate(${rotationDegree}deg)`;
+    }
+
+    function adjustBrightness() {
+    brightnessLevel = (brightnessLevel === 100) ? 150 : 100; // Toggle between normal and bright
+    document.getElementById('edit-image').style.filter = `brightness(${brightnessLevel}%)`;
+    }
+
+    function toggleBlackAndWhite() {
+    isBlackAndWhite = !isBlackAndWhite;
+    document.getElementById('edit-image').style.filter = isBlackAndWhite ? 'grayscale(100%)' : 'none';
+    }
+    document.getElementById('cart-id').addEventListener('click', () => {
+            window.location.assign("frame-cart.html")
+        });
+
+   
+   
+    </script>
+</body>
+</html>
